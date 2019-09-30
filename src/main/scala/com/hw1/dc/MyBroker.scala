@@ -66,6 +66,7 @@ object MyBroker {
       broker.submitCloudletList(cloudlets)
     }
 
-    broker // return broker
+    // return broker
+    broker
   }//end def create
-}//end object Broker
+}//end object MyBroker

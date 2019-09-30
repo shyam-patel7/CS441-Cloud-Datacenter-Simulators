@@ -43,4 +43,4 @@ object MyVm {
     else
       new Vm(vmId, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared)
   }//end def create
-}//end object Vm
+}//end object MyVm

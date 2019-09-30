@@ -28,6 +28,7 @@ object MyCloudlet {
   // use total ordering for doubles
   implicit val order: Double.TotalOrdering.type = Ordering.Double.TotalOrdering
 
+
   // utility method to create and return new cloudlet
   def create(cloudletId: Int, brokerId: Int, brokerName: String, brokerPath: String, conf: Config): Cloudlet = {
     // path of cloudlet
@@ -53,42 +54,6 @@ object MyCloudlet {
     cloudlet.setUserId(brokerId)
     cloudlet
   }//end def create
-
-  // utility method to calculate and return mean utilization
-  def meanUtilization(um: UtilizationModel, time: Double): Double = {
-    val utilization: List[Double] = List.tabulate(time.toInt)(n => um.getUtilization(n))
-    utilization.sum / utilization.size * 100
-  }//end def meanUtilization
-
-  // utility method to print simulation results for received cloudlets
-  def results(simulationId: Int, brokerName: String, cloudlets: util.List[_ <: Cloudlet]): Unit = {
-    // results table header
-    Log.printLine(s"    ================================ Simulation #$simulationId Results for $brokerName ================================")
-    Log.printLine("    | Cloudlet | Status  | Datacenter | VM # | Time (ms) | Start     | Finish    | CPU    | Cost ($)  |")
-
-    // list of costs
-    val costs: List[Double] = List.tabulate(cloudlets.size)(n => {
-      val cloudlet: Cloudlet = cloudlets.get(n)
-      if (cloudlet.getCloudletStatus == Cloudlet.SUCCESS) {
-        // results table data for each cloudlet
-        Log.printLine(String.format("    |    %-5d | SUCCESS |     %-6d |  %-3d | %9s | %9s | %9s | %-5s%% | %9s |",
-          cloudlet.getCloudletId, cloudlet.getResourceId - 1, cloudlet.getVmId,   // ID, datacenter ID, VM ID
-          df.format(cloudlet.getActualCPUTime),                                   // CPU time
-          df.format(cloudlet.getExecStartTime),                                   // start time
-          df.format(cloudlet.getFinishTime),                                      // finish time
-          df.format(meanUtilization(cloudlet.getUtilizationModelCpu, cloudlet.getActualCPUTime)),
-          df.format(cloudlet.getCostPerSec * cloudlet.getActualCPUTime)))         // cost
-
-        if (n == cloudlets.size - 1)                                              // total CPU time
-          Log.printLine(String.format("    In simulation #%d, %s received %d cloudlets in %s ms",
-            simulationId, brokerName, cloudlets.size, df.format(cloudlet.getFinishTime - 0.1)))
-
-        cloudlet.getCostPerSec * cloudlet.getActualCPUTime
-      } else 0.0
-    })
-    // total cost
-    Log.printLine(String.format("    The total cost for %s is: $%s\n", brokerName, df.format(costs.sum)))
-  }//end def results
 
   // utility method to create and return new mapped cloudlet
   def mapper(cloudletId: Int, brokerId: Int, brokerName: String, brokerPath: String, conf: Config): Cloudlet = {
@@ -118,6 +83,12 @@ object MyCloudlet {
     cloudlet.setUserId(brokerId)
     cloudlet
   }//end def mapper
+
+  // utility method to calculate and return mean utilization
+  def meanUtilization(um: UtilizationModel, time: Double): Double = {
+    val utilization: List[Double] = List.tabulate(time.toInt)(n => um.getUtilization(n))
+    utilization.sum / utilization.size * 100
+  }//end def meanUtilization
 
   // utility method to reduce mapped cloudlets and print results for received cloudlets
   def reducer(simulationId: Int, brokerName: String, cloudlets: util.List[_ <: Cloudlet]): Unit = {
@@ -164,4 +135,35 @@ object MyCloudlet {
       simulationId, brokerName, results.size, df.format(results(results.size - 1)._6._2 - 0.1)))
     Log.printLine(String.format("    The total cost for %s is: $%s\n", brokerName, df.format(costs.sum)))
   }//end def reducer
-}//end object Cloudlet
+
+  // utility method to print simulation results for received cloudlets
+  def results(simulationId: Int, brokerName: String, cloudlets: util.List[_ <: Cloudlet]): Unit = {
+    // results table header
+    Log.printLine(s"    ================================ Simulation #$simulationId Results for $brokerName ================================")
+    Log.printLine("    | Cloudlet | Status  | Datacenter | VM # | Time (ms) | Start     | Finish    | CPU    | Cost ($)  |")
+
+    // list of costs
+    val costs: List[Double] = List.tabulate(cloudlets.size)(n => {
+      val cloudlet: Cloudlet = cloudlets.get(n)
+      if (cloudlet.getCloudletStatus == Cloudlet.SUCCESS) {
+        // results table data for each cloudlet
+        Log.printLine(String.format("    |    %-5d | SUCCESS |     %-6d |  %-3d | %9s | %9s | %9s | %-5s%% | %9s |",
+          cloudlet.getCloudletId, cloudlet.getResourceId - 1, cloudlet.getVmId,   // ID, datacenter ID, VM ID
+          df.format(cloudlet.getActualCPUTime),                                   // CPU time
+          df.format(cloudlet.getExecStartTime),                                   // start time
+          df.format(cloudlet.getFinishTime),                                      // finish time
+          df.format(meanUtilization(cloudlet.getUtilizationModelCpu, cloudlet.getActualCPUTime)),
+          df.format(cloudlet.getCostPerSec * cloudlet.getActualCPUTime)))         // cost
+
+        if (n == cloudlets.size - 1)                                              // total CPU time
+          Log.printLine(String.format("    In simulation #%d, %s received %d cloudlets in %s ms",
+            simulationId, brokerName, cloudlets.size, df.format(cloudlet.getFinishTime - 0.1)))
+
+        cloudlet.getCostPerSec * cloudlet.getActualCPUTime
+      } else 0.0
+    })
+
+    // total cost
+    Log.printLine(String.format("    The total cost for %s is: $%s\n", brokerName, df.format(costs.sum)))
+  }//end def results
+}//end object MyCloudlet

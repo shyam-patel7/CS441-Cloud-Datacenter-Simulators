@@ -55,4 +55,4 @@ object MyDatacenter {
     new Datacenter(datacenterName, characteristics, new VmAllocationPolicySimple(hosts),
       new util.LinkedList[Storage], 0)
   }//end def create
-}//end object Datacenter
+}//end object MyDatacenter

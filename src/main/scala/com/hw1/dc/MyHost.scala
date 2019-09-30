@@ -42,4 +42,4 @@ object MyHost {
     new Host(hostId, new RamProvisionerSimple(ram), new BwProvisionerSimple(bw),
       storage, pes, new VmSchedulerTimeShared(pes))
   }//end def create
-}//end object Host
+}//end object MyHost
