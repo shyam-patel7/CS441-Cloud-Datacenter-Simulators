@@ -110,7 +110,7 @@ object MyCloudlet {
       results(n)._8._2
     })
                                                                                     // total CPU time and total cost
-    Log.printLine(String.format("    In simulation #%d, %s received %d cloudlets (%d slaves) in %s ms",
+    Log.printLine(String.format("    In simulation #%d, %s received %d cloudlets (via %d slaves) in %s ms",
       simulationId, brokerName, results.size, cloudlets.size, df.format(results(results.size - 1)._6._2 - 0.1)))
     Log.printLine(String.format("    The total cost for %s is: $%s\n", brokerName, df.format(costs.sum)))
   }//end def reducer
