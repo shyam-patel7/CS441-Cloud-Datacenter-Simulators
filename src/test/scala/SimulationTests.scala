@@ -14,7 +14,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import java.util.Calendar
 import java.util
 
-
+// SimulationTests class consisting of 8 unit tests based on the JUnit test framework
 @DisplayName("Simulation Tests")
 class SimulationTests {
   // logger
@@ -174,8 +174,7 @@ class SimulationTests {
     })
     val cloudlets: util.List[_ <: Vm] = broker.getCloudletList
     assertNotNull(cloudlets)
-    assertEquals(30, cloudlets.size)
-    log.info(String.format("%d cloudlets successfully created.", cloudlets.size / 2))
+    log.info(String.format("%d slave cloudlets successfully created.", cloudlets.size))
     log.info("Test successfully completed.")
   }//end def createBroker
 
@@ -235,7 +234,8 @@ class SimulationTests {
     log.info("Creating cloudlets...")
     val vmIds: List[Int] = List.tabulate(num_cloudlet)(n => n % num_vm + 1).flatMap(x => List(x, x))
     val cloudlets: List[Cloudlet] = List.tabulate(num_cloudlet)(n => {
-      val cloudlet: Cloudlet = MyCloudlet.create(n + 1, 1, "broker1", "simulation2.broker1", c)
+      val cloudlet: Cloudlet =
+        MyCloudlet.create(n + 1, 1, "broker1", "simulation2.broker1", map_reduce = false, 0, c)
       // assign mapped cloudlets to same VM to ensure data locality
       cloudlet.setVmId(vmIds(n))
       cloudlet
@@ -298,10 +298,8 @@ class SimulationTests {
     log.info(String.format("%s successfully created.", brokerName))
     log.info("Beginning simulation...")
     CloudSim.startSimulation()
-    log.info("Reducing mapped cloudlets...")
-    println
+    log.info("Reducing mapped cloudlets...\n")
     MyCloudlet.reducer(3, brokerName, broker.getCloudletReceivedList)
-    CloudSim.stopSimulation()
     log.info("Test successfully completed.")
   }//end def mapReduce
 }//end class SimulationTests

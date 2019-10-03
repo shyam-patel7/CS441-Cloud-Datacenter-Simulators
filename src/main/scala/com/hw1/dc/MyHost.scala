@@ -12,34 +12,24 @@ import org.cloudbus.cloudsim.provisioners.{BwProvisionerSimple, PeProvisionerSim
 import org.slf4j.{Logger, LoggerFactory}
 import java.util
 
-
+// MyHost class, part of the dc package, used by the MyDatacenter class to create new hosts
 object MyHost {
-  // logger
-  val log: Logger = LoggerFactory.getLogger(this.getClass)
+  val log: Logger = LoggerFactory.getLogger(this.getClass)                          // logger
 
-  // utility method to create and return new host
-  def create(hostId: Int, datacenterName: String, datacenterPath: String, conf: Config): Host = {
-    // path of host
-    val hostPath: String = datacenterPath + ".host" + hostId.toString
-    // machine memory
-    val ram: Int = conf.getInt(hostPath + ".ram")
-    // machine bandwidth
-    val bw: Int = conf.getInt(hostPath + ".bw")
-    // machine storage
-    val storage: Int = conf.getInt(hostPath + ".storage")
-    // million instructions/sec (MIPS) rating
-    val mips: Int = conf.getInt(hostPath + ".mips")
-    // number of cores
-    val num_core: Int = conf.getInt(hostPath + ".num_core")
-    log.info(s"$datacenterName: Creating host$hostId...")
+  // method to create and return new host
+  def create(hId: Int, dName: String, dPath: String, conf: Config): Host = {
+    val path:     String = dPath + ".host" + hId.toString                           // path of host
+    val ram:      Int    = conf.getInt(path + ".ram")                               // machine memory
+    val bw:       Int    = conf.getInt(path + ".bw")                                // machine bandwidth
+    val storage:  Int    = conf.getInt(path + ".storage")                           // machine storage
+    val mips:     Int    = conf.getInt(path + ".mips")                              // MIPS rating
+    val num_core: Int    = conf.getInt(path + ".num_core")                          // number of cores
+    val pes: util.ArrayList[Pe] = new util.ArrayList[Pe](num_core)                  // list of processing elements
+    List.range(1, num_core + 1).foreach(peId => pes.add(new Pe(peId, new PeProvisionerSimple(mips))))
+
+    log.info(s"$dName: Creating host$hId...")
     log.info(s"[$ram MB RAM; $storage MB storage; $mips MIPS; $num_core cores]")
-    // list of processing elements (Pe's)
-    val peIds: List[Int] = List.range(1, num_core + 1)
-    val pes: util.ArrayList[Pe] = new util.ArrayList[Pe](num_core)
-    peIds.foreach(peId => pes.add(new Pe(peId, new PeProvisionerSimple(mips))))
-
-    // return new host
-    new Host(hostId, new RamProvisionerSimple(ram), new BwProvisionerSimple(bw),
+    new Host(hId, new RamProvisionerSimple(ram), new BwProvisionerSimple(bw),    // return new host
       storage, pes, new VmSchedulerTimeShared(pes))
   }//end def create
 }//end object MyHost

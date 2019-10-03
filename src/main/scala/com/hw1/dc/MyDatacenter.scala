@@ -11,48 +11,32 @@ import org.cloudbus.cloudsim.{Datacenter, DatacenterCharacteristics, Host, Stora
 import org.slf4j.{Logger, LoggerFactory}
 import java.util
 
-
+// MyDatacenter class, part of the dc package, used by the Simulation class to create new datacenters
 object MyDatacenter {
-  // logger
-  val log: Logger = LoggerFactory.getLogger(this.getClass)
+  val log: Logger = LoggerFactory.getLogger(this.getClass)                          // logger
 
-  // utility method to create and return new datacenter
-  def create(datacenterId: Int, simulationId: Int, simulationPath: String, conf: Config): Datacenter = {
-    // name of datacenter
-    val datacenterName: String = "datacenter" + datacenterId.toString
-    // path of datacenter
-    val datacenterPath: String = simulationPath + "." + datacenterName
-    // system architecture
-    val arch: String = conf.getString(datacenterPath + ".arch")
-    // operating system
-    val os: String = conf.getString(datacenterPath + ".os")
-    // VM monitor
-    val vmm: String = conf.getString(datacenterPath + ".vmm")
-    // resource time zone
-    val time_zone: Double = conf.getDouble(datacenterPath + ".time_zone")
-    // resource CPU cost
-    val cost: Double = conf.getDouble(datacenterPath + ".cost")
-    // resource memory cost
-    val costPerMem: Double = conf.getDouble(datacenterPath + ".costPerMem")
-    // resource storage cost
-    val costPerStorage: Double = conf.getDouble(datacenterPath + ".costPerStorage")
-    log.info(s"Simulation #$simulationId: Creating $datacenterName...")
-    log.info(s"[$arch $os; VM monitor: $vmm; UTC$time_zone]")
-    log.info(s"[Costs per CPU: $$$cost; Memory: $$$costPerMem; Storage: $$$costPerStorage]")
-    // resource bandwidth cost
-    val costPerBw: Double = conf.getDouble(datacenterPath + ".costPerBw")
-    // number of hosts
-    val num_host: Int = conf.getInt(datacenterPath + ".num_host")
-    // list of hosts
-    val hostIds: List[Int] = List.range(1, num_host + 1)
-    val hosts: util.ArrayList[Host] = new util.ArrayList[Host](num_host)
-    hostIds.foreach(hostId => hosts.add(MyHost.create(hostId, datacenterName, datacenterPath, conf)))
-    // characteristics instance
-    val characteristics: DatacenterCharacteristics =
+  // method to create and return new datacenter
+  def create(dId: Int, sId: Int, sPath: String, conf: Config): Datacenter = {
+    val name:           String = "datacenter" + dId.toString                        // name of datacenter
+    val path:           String = sPath + "." + name                                 // path of datacenter
+    val arch:           String = conf.getString(path + ".arch")                     // system architecture
+    val os:             String = conf.getString(path + ".os")                       // operating system
+    val vmm:            String = conf.getString(path + ".vmm")                      // VM monitor
+    val time_zone:      Double = conf.getDouble(path + ".time_zone")                // resource time zone
+    val cost:           Double = conf.getDouble(path + ".cost")                     // resource CPU cost
+    val costPerMem:     Double = conf.getDouble(path + ".costPerMem")               // resource memory cost
+    val costPerStorage: Double = conf.getDouble(path + ".costPerStorage")           // resource storage cost
+    val costPerBw:      Double = conf.getDouble(path + ".costPerBw")                // resource bandwidth cost
+    val num_host:       Int    = conf.getInt(path + ".num_host")                    // number of hosts
+    val hosts: util.ArrayList[Host] = new util.ArrayList[Host](num_host)            // list of hosts
+    List.range(1, num_host + 1).foreach(h => hosts.add(MyHost.create(h, name, path, conf)))
+    val dc: DatacenterCharacteristics =                                             // datacenter characteristics
       new DatacenterCharacteristics(arch, os, vmm, hosts, time_zone, cost, costPerMem, costPerStorage, costPerBw)
 
-    // return new datacenter
-    new Datacenter(datacenterName, characteristics, new VmAllocationPolicySimple(hosts),
+    log.info(s"Simulation #$sId: Creating $name...")
+    log.info(s"[$arch $os; VM monitor: $vmm; UTC$time_zone]")
+    log.info(s"[Costs per CPU: $$$cost; Memory: $$$costPerMem; Storage: $$$costPerStorage]")
+    new Datacenter(name, dc, new VmAllocationPolicySimple(hosts),                   // return new datacenter
       new util.LinkedList[Storage], 0)
   }//end def create
 }//end object MyDatacenter

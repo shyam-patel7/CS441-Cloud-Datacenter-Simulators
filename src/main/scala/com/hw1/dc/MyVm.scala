@@ -7,40 +7,28 @@
 package com.hw1.dc
 
 import com.typesafe.config.Config
-import org.cloudbus.cloudsim.{CloudletSchedulerSpaceShared, CloudletSchedulerTimeShared, Vm}
+import org.cloudbus.cloudsim.{CloudletScheduler, CloudletSchedulerSpaceShared, CloudletSchedulerTimeShared, Vm}
 import org.slf4j.{Logger, LoggerFactory}
 
-
+// MyVm class, part of the dc package, used by the MyBroker class to create new VMs
 object MyVm {
-  // logger
-  val log: Logger = LoggerFactory.getLogger(this.getClass)
+  val log: Logger = LoggerFactory.getLogger(this.getClass)                          // logger
 
-  // utility method to create and return new VM
-  def create(vmId: Int, brokerId: Int, brokerName: String, brokerPath: String, conf: Config): Vm = {
-    // path of VM
-    val vmPath: String = brokerPath + ".vm" + vmId.toString
-    // million instructions/sec (MIPS) rating
-    val mips: Int = conf.getInt(vmPath + ".mips")
-    // number of CPUs
-    val pesNumber: Int = conf.getInt(vmPath + ".pesNumber")
-    // VM memory
-    val ram: Int = conf.getInt(vmPath + ".ram")
-    // VM bandwidth
-    val bw: Int = conf.getInt(vmPath + ".bw")
-    // VM image size
-    val size: Int = conf.getInt(vmPath + ".size")
-    // VM monitor
-    val vmm: String = conf.getString(vmPath + ".vmm")
-    // cloudlet scheduler policy
-    val cloudletPolicy: String = conf.getString(vmPath + ".cloudletPolicy")
-    log.info(s"$brokerName: Creating VM #$vmId...")
-    log.info(s"[$mips MIPS; $pesNumber vCPU; $ram MB RAM; $cloudletPolicy scheduler policy]")
+  // method to create and return new VM
+  def create(vId: Int, bId: Int, bName: String, bPath: String, conf: Config): Vm = {
+    val path:   String = bPath + ".vm" + vId.toString                               // path of VM
+    val mips:   Int    = conf.getInt(path + ".mips")                                // MIPS rating
+    val pes:    Int    = conf.getInt(path + ".pesNumber")                           // number of CPUs
+    val ram:    Int    = conf.getInt(path + ".ram")                                 // VM memory
+    val bw:     Int    = conf.getInt(path + ".bw")                                  // VM bandwidth
+    val size:   Int    = conf.getInt(path + ".size")                                // VM image size
+    val vmm:    String = conf.getString(path + ".vmm")                              // VM monitor
+    val policy: String = conf.getString(path + ".cloudletPolicy")                   // cloudlet scheduler policy
+    val cs: CloudletScheduler = if (policy == "Time-shared") new CloudletSchedulerTimeShared
+                                else                         new CloudletSchedulerSpaceShared
 
-    // return new VM with time-shared cloudlet scheduler policy
-    if (cloudletPolicy == "Time-shared")
-      new Vm(vmId, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared)
-    // return new VM with space-shared cloudlet scheduler policy
-    else
-      new Vm(vmId, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared)
+    log.info(s"$bName: Creating VM #$vId...")
+    log.info(s"[$mips MIPS; $pes vCPU; $ram MB RAM; $policy scheduler policy]")
+    new Vm(vId, bId, mips, pes, ram, bw, size, vmm, cs)                             // return new VM
   }//end def create
 }//end object MyVm
