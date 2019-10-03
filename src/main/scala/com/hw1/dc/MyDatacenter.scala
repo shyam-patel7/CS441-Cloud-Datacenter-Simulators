@@ -29,7 +29,7 @@ object MyDatacenter {
     val costPerBw:      Double = conf.getDouble(path + ".costPerBw")                // resource bandwidth cost
     val num_host:       Int    = conf.getInt(path + ".num_host")                    // number of hosts
     val hosts: util.ArrayList[Host] = new util.ArrayList[Host](num_host)            // list of hosts
-    List.range(1, num_host + 1).foreach(h => hosts.add(MyHost.create(h, name, path, conf)))
+    (1 until num_host + 1).foreach(hId => hosts.add(MyHost.create(hId, name, path, conf)))
     val dc: DatacenterCharacteristics =                                             // datacenter characteristics
       new DatacenterCharacteristics(arch, os, vmm, hosts, time_zone, cost, costPerMem, costPerStorage, costPerBw)
 

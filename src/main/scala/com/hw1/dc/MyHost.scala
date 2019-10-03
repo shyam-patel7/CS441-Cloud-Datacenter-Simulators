@@ -25,7 +25,7 @@ object MyHost {
     val mips:     Int    = conf.getInt(path + ".mips")                              // MIPS rating
     val num_core: Int    = conf.getInt(path + ".num_core")                          // number of cores
     val pes: util.ArrayList[Pe] = new util.ArrayList[Pe](num_core)                  // list of processing elements
-    List.range(1, num_core + 1).foreach(peId => pes.add(new Pe(peId, new PeProvisionerSimple(mips))))
+    (1 until num_core + 1).foreach(peId => pes.add(new Pe(peId, new PeProvisionerSimple(mips))))
 
     log.info(s"$dName: Creating host$hId...")
     log.info(s"[$ram MB RAM; $storage MB storage; $mips MIPS; $num_core cores]")

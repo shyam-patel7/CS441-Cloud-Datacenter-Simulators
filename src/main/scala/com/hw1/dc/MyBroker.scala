@@ -26,7 +26,7 @@ object MyBroker {
 
     val num_vm: Int    = conf.getInt(path + ".num_vm")                              // number of VMs
     val vms: util.ArrayList[Vm] = new util.ArrayList[Vm](num_vm)                    // list of VMs
-    List.range(1, num_vm + 1).foreach(vmId => vms.add(MyVm.create(vmId, bId, name, path, conf)))
+    (1 until num_vm + 1).foreach(vmId => vms.add(MyVm.create(vmId, bId, name, path, conf)))
     log.info(s"Sending list of VMs to $name...")
     broker.submitVmList(vms)                                                        // send list of VMs to broker
 
@@ -34,7 +34,7 @@ object MyBroker {
     val cloudlets: util.ArrayList[Cloudlet] =                                       // list of cloudlets
       if (!map_reduce) new util.ArrayList[Cloudlet](num_cloudlet)
       else             MyCloudlet.mapper(num_cloudlet, num_vm, bId, name, path, conf)
-    if (!map_reduce)   List.range(1, num_cloudlet + 1).foreach(cId =>
+    if (!map_reduce)   (1 until num_cloudlet + 1).foreach(cId =>
       cloudlets.add(MyCloudlet.create(cId, bId, name, path, map_reduce = false, 0, conf)))
     log.info(s"Sending list of cloudlets to $name...")
     broker.submitCloudletList(cloudlets)                                            // send list of cloudlets to broker

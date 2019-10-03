@@ -36,7 +36,7 @@ object Simulation {
     CloudSim.init(num_user, Calendar.getInstance, trace_flag)                       // initialize CloudSim
 
     // (3) create datacenter(s) with host(s)
-    (0 until num_datacenter).foreach(d => MyDatacenter.create(d + 1, sId, path, conf))
+    (1 until num_datacenter + 1).foreach(dId => MyDatacenter.create(dId, sId, path, conf))
 
     // (4) create broker(s) with VM(s) and cloudlet(s)
     val brokers: List[DatacenterBroker] =
