@@ -29,7 +29,7 @@ object MyHost {
 
     log.info(s"$dName: Creating host$hId...")
     log.info(s"[$ram MB RAM; $storage MB storage; $mips MIPS; $num_core cores]")
-    new Host(hId, new RamProvisionerSimple(ram), new BwProvisionerSimple(bw),    // return new host
+    new Host(hId, new RamProvisionerSimple(ram), new BwProvisionerSimple(bw),       // return new host
       storage, pes, new VmSchedulerTimeShared(pes))
   }//end def create
 }//end object MyHost
