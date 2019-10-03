@@ -8,7 +8,7 @@ package com.hw1
 
 import com.hw1.dc.{MyBroker, MyCloudlet, MyDatacenter}
 import com.typesafe.config.{Config, ConfigFactory}
-import org.cloudbus.cloudsim.DatacenterBroker
+import org.cloudbus.cloudsim.{DatacenterBroker, Log}
 import org.cloudbus.cloudsim.core.CloudSim
 import org.slf4j.{Logger, LoggerFactory}
 import java.util.Calendar
@@ -33,6 +33,7 @@ object Simulation {
     val num_broker:     Int     = conf.getInt(path + ".num_broker")                 // number of brokers
     log.info(s"[Number of users: $num_user; Trace events: $trace_flag; MapReduce: $map_reduce]")
     log.info(s"[Number of datacenters: $num_datacenter; Number of brokers: $num_broker]")
+    Log.disable()                                                                   // disable CloudSim logs
     CloudSim.init(num_user, Calendar.getInstance, trace_flag)                       // initialize CloudSim
 
     // (3) create datacenter(s) with host(s)
@@ -45,7 +46,7 @@ object Simulation {
     // (5) run cloud simulation and display results for received cloudlets
     CloudSim.startSimulation()
     log.info("Analyzing received cloudlets...\n")
-    if (!map_reduce) brokers.foreach(b => MyCloudlet.results(sId, b.getName, b.getCloudletReceivedList))
-    else             brokers.foreach(b => MyCloudlet.reducer(sId, b.getName, b.getCloudletReceivedList))
+    if (map_reduce) brokers.foreach(b => MyCloudlet.reducer(sId, b.getName, b.getCloudletReceivedList))
+    else            brokers.foreach(b => MyCloudlet.results(sId, b.getName, b.getCloudletReceivedList))
   }//end def run
 }//end object Simulation

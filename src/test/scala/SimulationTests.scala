@@ -7,7 +7,7 @@
 import com.hw1.dc.{MyBroker, MyCloudlet, MyDatacenter, MyHost, MyVm}
 import com.typesafe.config.{Config, ConfigFactory}
 import org.cloudbus.cloudsim.core.CloudSim
-import org.cloudbus.cloudsim.{Cloudlet, Datacenter, DatacenterBroker, Host, Vm}
+import org.cloudbus.cloudsim.{Cloudlet, Datacenter, DatacenterBroker, Host, Log, Vm}
 import org.junit.jupiter.api.{BeforeEach, DisplayName, Test}
 import org.junit.jupiter.api.Assertions.{assertEquals, assertFalse, assertNotNull, assertTrue}
 import org.slf4j.{Logger, LoggerFactory}
@@ -34,6 +34,7 @@ class SimulationTests {
     assertEquals(1, num_user)
     assertFalse(trace_flag)
     CloudSim.init(num_user, Calendar.getInstance, trace_flag)
+    Log.disable()
     val entityId: Int = CloudSim.getCloudInfoServiceEntityId
     assertNotNull(entityId)
     assertEquals(1, entityId)
@@ -98,9 +99,8 @@ class SimulationTests {
     assertEquals(1, num_datacenter)
     log.info("Creating datacenter...")
     log.info("Creating hosts...")
-    val datacenters: List[Datacenter] = List.tabulate(num_datacenter)(n => {
-      MyDatacenter.create(n + 1, 3, "simulation3", conf)
-    })
+    val datacenters: List[Datacenter] = List.tabulate(num_datacenter)(n =>
+      MyDatacenter.create(n + 1, 3, "simulation3", conf))
     assertNotNull(datacenters)
     assertEquals(1, datacenters.size)
     val name: String = datacenters(0).getName
@@ -122,28 +122,26 @@ class SimulationTests {
     assertNotNull(num_host)
     assertEquals(2, num_host)
     log.info("Creating hosts...")
-    val hosts: List[Host] = List.tabulate(num_host)(n => {
-      MyHost.create(n + 1, "datacenter1", "simulation3.datacenter1", conf)
-    })
+    val hosts: util.List[Host] = MyHost.create(num_host, "datacenter1", "simulation3.datacenter1", conf)
     assertNotNull(hosts)
     assertEquals(num_host, hosts.size)
-    val host1Mips: Double = hosts(0).getAvailableMips
-    val host1Ram: Double = hosts(0).getRam
-    val host2Bw: Long = hosts(1).getBw
-    val host2Storage: Long = hosts(1).getStorage
+    val host1Mips: Double = hosts.get(0).getAvailableMips
+    val host1Ram: Double = hosts.get(0).getRam
+    val host2Bw: Long = hosts.get(1).getBw
+    val host2Storage: Long = hosts.get(1).getStorage
     assertNotNull(host1Mips)
     assertNotNull(host1Ram)
     assertNotNull(host2Bw)
     assertNotNull(host2Storage)
-    log.info(s"host1 available MIPS: $host1Mips (expected 6000.0)")
-    log.info(s"host1 memory: $host1Ram (expected 2048.0)")
+    log.info(s"host1 available MIPS: $host1Mips (expected 16000.0)")
+    log.info(s"host1 memory: $host1Ram (expected 4096.0)")
     log.info(s"host2 bandwidth: $host2Bw (expected 10000)")
     log.info(s"host2 storage: $host2Storage (expected 1000000)")
-    assertEquals(6000, host1Mips)
-    assertEquals(2048, host1Ram)
+    assertEquals(16000.0, host1Mips)
+    assertEquals(4096.0, host1Ram)
     assertEquals(10000, host2Bw)
     assertEquals(1000000, host2Storage)
-    hosts.foreach(host => log.info(String.format("host%d successfully created.", host.getId)))
+    hosts.forEach(host => log.info(String.format("host%d successfully created.", host.getId)))
     log.info("Test successfully completed.")
   }//end def createHost
 
@@ -169,9 +167,7 @@ class SimulationTests {
     val vms: util.List[_ <: Vm] = broker.getVmList
     assertNotNull(vms)
     assertEquals(3, vms.size)
-    (0 until vms.size).foreach(vm => {
-      log.info(String.format("VM #%d successfully created.", vm + 1))
-    })
+    (0 until vms.size).foreach(vm => log.info(String.format("VM #%d successfully created.", vm + 1)))
     val cloudlets: util.List[_ <: Vm] = broker.getCloudletList
     assertNotNull(cloudlets)
     log.info(String.format("%d slave cloudlets successfully created.", cloudlets.size))
@@ -186,17 +182,15 @@ class SimulationTests {
     assertNotNull(num_vm)
     assertEquals(3, num_vm)
     log.info("Creating VMs...")
-    val vms: List[Vm] = List.tabulate(num_vm)(n => {
-      MyVm.create(n + 1, 1, "broker1", "simulation3.broker1", conf)
-    })
+    val vms: util.List[Vm] = MyVm.create(num_vm, 1, "broker1", "simulation3.broker1", conf)
     assertNotNull(vms)
     assertEquals(num_vm, vms.size)
-    val vm1Bw: Long = vms(0).getBw
-    val vm1Pes: Int = vms(0).getNumberOfPes
-    val vm2Id: Int = vms(1).getId
-    val vm2Size: Long = vms(1).getSize
-    val vm3Mips: Double = vms(2).getMips
-    val vm3Vmm: String = vms(2).getVmm
+    val vm1Bw: Long = vms.get(0).getBw
+    val vm1Pes: Int = vms.get(0).getNumberOfPes
+    val vm2Id: Int = vms.get(1).getId
+    val vm2Size: Long = vms.get(1).getSize
+    val vm3Mips: Double = vms.get(2).getMips
+    val vm3Vmm: String = vms.get(2).getVmm
     assertNotNull(vm1Bw)
     assertNotNull(vm1Pes)
     assertNotNull(vm2Id)
@@ -215,7 +209,7 @@ class SimulationTests {
     assertEquals(10000, vm2Size)
     assertEquals(1000.0, vm3Mips)
     assertEquals("Xen", vm3Vmm)
-    vms.foreach(vm => log.info(String.format("VM #%d successfully created.", vm.getId)))
+    vms.forEach(vm => log.info(String.format("VM #%d successfully created.", vm.getId)))
     log.info("Test successfully completed.")
   }//end def createVm
 
@@ -231,39 +225,21 @@ class SimulationTests {
     assertNotNull(num_cloudlet)
     assertEquals(3, num_vm)
     assertEquals(15, num_cloudlet)
-    log.info("Creating cloudlets...")
-    val vmIds: List[Int] = List.tabulate(num_cloudlet)(n => n % num_vm + 1).flatMap(x => List(x, x))
-    val cloudlets: List[Cloudlet] = List.tabulate(num_cloudlet)(n => {
-      val cloudlet: Cloudlet =
-        MyCloudlet.create(n + 1, 1, "broker1", "simulation2.broker1", map_reduce = false, 0, c)
-      // assign mapped cloudlets to same VM to ensure data locality
-      cloudlet.setVmId(vmIds(n))
-      cloudlet
-    })
-    val cloudlet1Id: Int = cloudlets(0).getCloudletId
-    val cloudlet1Vm: Int = cloudlets(0).getVmId
-    val cloudlet6Id: Int = cloudlets(5).getCloudletId
-    val cloudlet6Vm: Int = cloudlets(5).getVmId
-    val cloudlet15Id: Int = cloudlets(14).getCloudletId
-    val cloudlet15Vm: Int = cloudlets(14).getVmId
+    val cloudlets: util.List[Cloudlet] = MyCloudlet.create(num_cloudlet, 0, "broker1", "simulation2.broker1", c)
+    assertNotNull(cloudlets)
+    assertEquals(15, cloudlets.size)
+    val cloudlet1Id: Int = cloudlets.get(14).getCloudletId
+    val cloudlet6Id: Int = cloudlets.get(9).getCloudletId
+    val cloudlet15Id: Int = cloudlets.get(0).getCloudletId
     assertNotNull(cloudlet1Id)
-    assertNotNull(cloudlet1Vm)
     assertNotNull(cloudlet6Id)
-    assertNotNull(cloudlet6Vm)
     assertNotNull(cloudlet15Id)
-    assertNotNull(cloudlet15Vm)
     log.info(s"Cloudlet 1 ID: $cloudlet1Id (expected 1)")
-    log.info(s"Cloudlet 1 VM: $cloudlet1Vm (expected 1)")
     log.info(s"Cloudlet 6 ID: $cloudlet6Id (expected 6)")
-    log.info(s"Cloudlet 6 VM: $cloudlet6Vm (expected 3)")
     log.info(s"Cloudlet 15 ID: $cloudlet15Id (expected 15)")
-    log.info(s"Cloudlet 15 VM: $cloudlet15Vm (expected 2)")
     assertEquals(1, cloudlet1Id)
-    assertEquals(1, cloudlet1Vm)
     assertEquals(6, cloudlet6Id)
-    assertEquals(3, cloudlet6Vm)
     assertEquals(15, cloudlet15Id)
-    assertEquals(2, cloudlet15Vm)
     log.info(String.format("%d cloudlets successfully created.", cloudlets.size))
     log.info("Test successfully completed.")
   }//end def createCloudlet
