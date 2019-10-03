@@ -84,13 +84,12 @@ object MyCloudlet {
           meanUtil(s.getUtilizationModelCpu, s.getActualCPUTime),                   // mean CPU util,
           s.getCostPerSec * s.getActualCPUTime)                                     // and cost
       else (0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0)
-    }).groupBy(_._1).transform((_, v) =>                                            // group by original cloudlet IDs
-      (v.map(_._1)(0),   v.map(_._2)(0),                                            // cloudlet ID, datacenter ID,
-       v.map(_._3)(0),   v.maxBy(_._6)._6 - v.minBy(_._5)._5,                       // VM ID, CPU time,
-       v.minBy(_._5)._5, v.maxBy(_._6)._6,                                          // start time, finish time,
-       v.maxBy(_._7)._7, v.map(_._8).sum)                                           // mean CPU util, and sum cost
-    ).values.toList.sortBy(_._6)                                                    // sort by ascending finish time
-
+    }).groupBy(_._1).transform((_, v) =>                                            // group by original cloudlet IDs:
+      (v.map(_._1)(0),   v.map(_._2)(0),                                            // (cloudlet ID, datacenter ID,
+       v.map(_._3)(0),   v.maxBy(_._6)._6 - v.minBy(_._5)._5,                       //  VM ID, CPU time (max - min),
+       v.minBy(_._5)._5, v.maxBy(_._6)._6,                                          //  min start time, max finish time,
+       v.maxBy(_._7)._7, v.map(_._8).sum)).values.toList.sortBy(_._6)               //  max mean CPU util, and sum cost)
+                                                                                    // sort by ascending finish time
     Log.printLine(s"    ================================ Simulation #$sId Results for $bName ================================")
     Log.printLine("    | Cloudlet | Status  | Datacenter | VM # | Time (ms) | Start     | Finish    | CPU    | Cost ($)  |")
 
