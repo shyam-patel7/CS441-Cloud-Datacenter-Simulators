@@ -8,7 +8,7 @@ package com.hw1
 
 import org.slf4j.{Logger, LoggerFactory}
 
-// Driver class that runs three simulations sequentially
+// Driver class that runs all simulations sequentially
 object Driver extends App {
   // logger
   val log: Logger = LoggerFactory.getLogger(this.getClass)
