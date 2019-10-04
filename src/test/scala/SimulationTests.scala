@@ -45,7 +45,7 @@ class SimulationTests extends FlatSpec with Matchers {
   it should "have Linux OS" in {
     ConfigFactory.load("simulation1").getString("simulation1.datacenter1.os") should be ("Linux")
   }
-  it should "have UTC-5:00 time" in {
+  it should "have time UTC-5:00" in {
     ConfigFactory.load("simulation1").getDouble("simulation1.datacenter1.time_zone") should be (-5.0)
   }
   it should "have $0.05 cost per memory" in {
