@@ -56,7 +56,7 @@ The MapReduce implementation in this project, enabled in simulation #3, is compr
 
 ## Results
 
-##### Simulation #1: Time-shared cloudlet scheduler policy
+###### Simulation #1: Time-shared cloudlet scheduler policy
 ```
 ============================================= broker1 =============================================
 | Cloudlet | Status  | Datacenter | VM # | Time (ms) | Start     | Finish    | CPU    | Cost ($)  |
@@ -102,7 +102,7 @@ The MapReduce implementation in this project, enabled in simulation #3, is compr
 - Although all 15 cloudlets share resources and start at the same time at 0.1 milliseconds, the cloudlets take much longer to complete execution as compared to what is observed in the subsequent simulation.
     - *Takeaway:* Context-switching and saving state information of cloudlets as they are processing and paused to grant other cloudlets CPU access substantially reduces performance and increases cost.
 
-##### Simulation #2: Space-shared cloudlet scheduler policy
+###### Simulation #2: Space-shared cloudlet scheduler policy
 ```
 ============================================= broker1 =============================================
 | Cloudlet | Status  | Datacenter | VM # | Time (ms) | Start     | Finish    | CPU    | Cost ($)  |
@@ -146,7 +146,7 @@ The MapReduce implementation in this project, enabled in simulation #3, is compr
     - The total cost for **broker2** to process 15 cloudlets is $11,206.13.
     - *Takeaway:* Context-switching and saving state information of cloudlets as they are processing and paused to grant other cloudlets CPU access reduces performance and substantially increases cost. Simply shifting from a time-shared cloudlet scheduler policy to one that is space-shared resulted in a 5% improvement in performance, but a **70-80% reduction in cost**.
 
-##### Simulation #3: Space-shared cloudlet scheduler policy with MapReduce
+###### Simulation #3: Space-shared cloudlet scheduler policy with MapReduce
 ```
 ============================================= broker1 =============================================
 | Cloudlet | Status  | Datacenter | VM # | Time (ms) | Start     | Finish    | CPU    | Cost ($)  |
